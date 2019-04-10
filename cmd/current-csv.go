@@ -15,18 +15,20 @@ var currentCSV = &cobra.Command{
 	Use:   "current-csv",
 	Short: "get the current CSV",
 	Run: func(cmd *cobra.Command, args []string) {
+		gitRepoURL = "https://github.com/app-sre/saas-hive-operator-bundle.git"
+		gitBranch = "staging"
+		gitDir = "hive"
+
 		fs := memfs.New()
 
 		// Git objects storer based on memory
 		storer := memory.NewStorage()
 
-		var branch plumbing.ReferenceName = "staging"
-
 		// Clones the repository into the worktree (fs) and storer all the .git
 		// content into the storer
 		_, err := git.Clone(storer, fs, &git.CloneOptions{
-			URL:           "https://github.com/app-sre/saas-hive-operator-bundle.git",
-			ReferenceName: branch,
+			URL:           gitRepoURL,
+			ReferenceName: plumbing.ReferenceName(gitBranch),
 		})
 		if err != nil {
 			log.Fatal(err)
