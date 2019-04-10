@@ -1,0 +1,42 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"os"
+
+	"github.com/ghodss/yaml"
+)
+
+func main() {
+	yamlFile, err := os.Open("test.yaml")
+	if err != nil {
+		panic(err)
+	}
+	defer yamlFile.Close()
+
+	byteValue, _ := ioutil.ReadAll(yamlFile)
+
+	var p map[string]interface{}
+
+	err = yaml.Unmarshal(byteValue, &p)
+	if err != nil {
+		panic(err)
+	}
+
+	metadata, ok := p["metadata"].(map[string]interface{})
+	if !ok {
+		metadata = make(map[string]interface{})
+		p["metadata"] = metadata
+	}
+
+	p["replaces"] = "myversion"
+	metadata["bla"] = "mybla"
+
+	y, err := yaml.Marshal(p)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(string(y))
+}
